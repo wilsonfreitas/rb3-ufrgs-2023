@@ -1,0 +1,3798 @@
+
+<!doctype html>
+<html class="no-js" lang="pt-br">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script type="text/javascript" src="/ruxitagentjs_ICA2NVfjqru_10271230629152232.js" data-dtconfig="rid=RID_1776545796|rpid=-1128066935|domain=bmf.com.br|reportUrl=/rb_ea8d7b8f-040c-423b-b726-54310cab2c40|app=e44446475f923f8e|cuc=kju5m9kg|mel=100000|featureHash=ICA2NVfjqru|dpvc=1|ssv=4|lastModification=1693631963038|vcv=2|tp=500,50,0,1|rdnt=1|uxrgce=1|bp=3|agentUri=/ruxitagentjs_ICA2NVfjqru_10271230629152232.js"></script><link rel="stylesheet" href="css/foundation.css" />
+<link rel="stylesheet" href="css/jquery.ui.datepicker.css" />
+<script src="js/vendor/modernizr.js"></script>
+
+<script type="text/javascript">
+function Retroativo(theForm) {
+    if(!CkDate(theForm.dData1, theForm.dData1.value))
+        {
+            
+                alert("Selecione o período que deseja fazer a consulta.");
+            
+            theForm.dData1.focus();
+            theForm.dData1.select();
+            return false;
+        }
+    if(!CkDate(theForm.dData2, theForm.dData2.value))
+        {
+            
+                alert("Selecione o período que deseja fazer a consulta.");
+            
+            theForm.dData2.focus();
+            theForm.dData2.select();
+            return false;
+        }
+
+    if (ComparaDatas(theForm.dData1.value, theForm.dData2.value) == 2)
+        {
+            
+                alert("A data final tem que ser maior que a data inicial.");
+            
+            theForm.dData2.focus();
+            theForm.dData2.select();
+            return false;
+        
+        }
+}
+
+function CkDate(campo,dData) {
+	var b_Ok;
+	b_Ok = true;
+	var sData = dData;
+	if(sData == "" )
+	{
+		b_Ok = false;
+	}
+	if(((sData.length)<(8))||((sData.length)>(10)))
+	{
+		b_Ok = false;
+	}
+	if(b_Ok)
+	{
+		var index;
+		var aux;
+		var sDia;
+		var sMes;
+		var sAno;
+        
+		sDia = sData.substr(0,sData.indexOf("/"));
+		sMes = sData.substr(sData.indexOf("/")+1,((sData.lastIndexOf("/"))-(sData.indexOf("/")))-1);
+	    
+		sAno = sData.substr(sData.lastIndexOf("/")+1,sData.length);
+		sData = sDia + "" + sMes + "" + sAno;
+		if(((sMes.length)!=(2))||((sDia.length)!=(2)))
+		{
+			b_Ok = false;
+		}
+		for(index=0;index<(sData.length);index++)
+		{
+			if(isNaN(sData.substr(index,1)))
+			{
+				b_Ok = false;
+			}
+		}
+		if(b_Ok)
+		{
+			if((sMes==0)||(sDia==0)||(sAno==0))
+			{
+				b_Ok = false;
+			}
+			if(((sDia.length)>(2))||((sDia.length)<(1)))
+			{
+				b_Ok = false;
+			}
+			if(((sMes.length)>(2))||((sMes.length)<(1)))
+			{
+				b_Ok = false;
+			}
+			if((sAno.length)!=(4))
+			{
+				b_Ok = false;
+			}
+			if(b_Ok)
+			{
+				if(((sAno)<(1990))||((sAno)>(2023)))
+				{
+					b_Ok = false;
+				}
+				else
+				{
+					if((sMes)>(12))
+					{
+						b_Ok = false;
+					}
+					else
+					{
+						if((sDia)>(31))
+						{
+							b_Ok = false;
+						}
+						else
+						{
+							aMes = new Array();
+							aMes[0] = 31;
+							if(((sAno)%(4))!=(0))
+							{
+								aMes[1] = 28;
+							}
+							else
+							{
+								aMes[1] = 29;
+							}
+							aMes[2] = 31;
+							aMes[3] = 30;
+							aMes[4] = 31;
+							aMes[5] = 30;
+							aMes[6] = 31;
+							aMes[7] = 31;
+							aMes[8] = 30;
+							aMes[9] = 31;
+							aMes[10] = 30;
+							aMes[11] = 31;
+							if((aMes[sMes-1])<(sDia))
+							{
+								b_Ok = false;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if(b_Ok)
+	{
+		return true;
+	}
+	else
+	{
+		campo.focus();
+		return false;
+	}
+}
+
+function mask_data(ini,fim,decimal,theForm) {
+  var keypressed = window.event.keyCode;
+  var ElementText  = window.event.srcElement.value ;
+  if (keypressed == 45){
+    if (ElementText.length!=0) {
+      window.event.keyCode = 0;
+      return;
+    }
+  }
+  if (keypressed == 46){
+    if (ElementText.length!=0) {
+      window.event.keyCode = 0;
+      return;
+    }
+  }
+  else
+  {
+    if (decimal)
+	{
+    	var Reg = /\./g;
+      	if (Reg.test(ElementText))
+		{
+			if( (keypressed >= 48 && keypressed <= 57) == false)
+			{
+			  window.event.keyCode = 0;
+			  return;
+			}
+		}
+		else
+		{
+			if ((keypressed >= 48 && keypressed <= 57 || keypressed == 46) == false) {
+        	window.event.keyCode = 0;
+          	return;
+        }
+      }
+    }
+    else
+	{
+    	if ((keypressed >= 48 && keypressed <= 57) == false)
+		{
+			window.event.keyCode = 0;
+    	    return;
+	    }
+    }
+  }
+  if (ini == 1 || fim == 1)
+  {
+    //javascript:mask_data('1','0',true)
+	if (ini == 1)
+	{
+		if (ElementText.length == 2 || ElementText.length == 5)
+		{
+			theForm.dData1.value += '/';
+		}
+	}
+    //javascript:mask_data('0','1',true)
+	if (fim == 1)
+	{
+		if (ElementText.length == 2 || ElementText.length == 5)
+		{
+			theForm.dData2.value += '/';
+		}
+	}
+  }
+  //javascript:mask_data('2','0',true)
+  if (ini == 2)
+  {
+	if (ElementText.length == 2 || ElementText.length == 5)
+    {
+        theForm.dData1.value += '/';
+    }
+  }
+}
+
+function ComparaDatas(dData1, dData2) {
+	var iData1 = 0;
+	var iData2 = 0;
+	var iDia1 = new String();
+	var iMes1 = new String();
+	var iAno1 = new String();
+	var iDia2 = new String();
+	var iMes2 = new String();
+	var iAno2 = new String();
+
+	if( dData1 == "" && dData2 != "")
+	{
+		return 2
+	}
+
+	if( dData1 != "" && dData2 == "")
+	{
+		return 2
+	}
+	iDia1 = dData1.substring(0,2);
+	iMes1 = dData1.substring(3,5);
+	iAno1 = dData1.substring(6,10);
+	iDia2 = dData2.substring(0,2);
+	iMes2 = dData2.substring(3,5);
+	iAno2 = dData2.substring(6,10);
+	iData1 = parseInt(iAno1 + iMes1 + iDia1);
+	iData2 = parseInt(iAno2 + iMes2 + iDia2);
+	if (iData1 == iData2)
+	{
+		return 0
+	}
+	else if (iData1 < iData2)
+	{
+		return 1
+	}
+	else if (iData1 > iData2)
+	{
+		return 2
+	}
+}
+
+function ComparaDatasMMAAAA(dData1, dData2) {
+	var dDataAtual = new Date();
+	var iMesAtual = new String();
+	var iAnoAtual = new String();
+	var iMesAtual = String((dDataAtual.getMonth())+1);
+	var iAnoAtual = String(dDataAtual.getFullYear());
+	
+    if(iMesAtual.length == 1)
+		iMesAtual = "0" + iMesAtual;
+	
+    var iDataAtual = 0;
+	var iData1 = 0;
+	var iData2 = 0;
+	var iMes1 = new String();
+	var iAno1 = new String();
+	var iMes2 = new String();
+	var iAno2 = new String();
+
+	if( dData1 == "" && dData2 != "")
+		return 2
+	if( dData1 != "" && dData2 == "")
+		return 2
+	iMes1 = dData1.substring(0,2);
+	iAno1 = dData1.substring(3,7);
+	iMes2 = dData2.substring(0,2);
+	iAno2 = dData2.substring(3,7);
+	iData1 = parseInt(iAno1 + iMes1);
+	iData2 = parseInt(iAno2 + iMes2);
+	iDataAtual = parseInt(iAnoAtual + iMesAtual);
+	
+    if (iData1 < 190001)
+		return 5; //Data1 fora do intervalo válido
+	else if (iData1 == iData2 && iData1 <= iDataAtual)
+		return 0; //Data1 é igual a Data2
+	else if (iData1 < iData2 && iData2 <= iDataAtual)
+		return 1; //Data1 é menor que Data2
+	else if (iData1 > iData2)
+		return 3; //Data1 é maior que Data2
+	else
+		return 4;
+}
+
+function ValidaPeriodoMMAAAA(dData1,dData2) {
+	var retorno_comparacao = ComparaDatasMMAAAA(dData2,dData2);
+	if(retorno_comparacao == 2)
+	{
+		
+			alert("Selecione o período que deseja fazer a consulta.");
+			
+		return false;
+	}	
+	else if(retorno_comparacao == 3)
+	{
+		
+			alert("A data final tem que ser maior que a data inicial.");
+			
+		return false;
+	}
+	else if(retorno_comparacao == 4)
+	{
+		if(dData1 == "mm/aaaa" || dData2 == "mm/aaaa")
+		{
+		
+			alert("Selecione o período que deseja fazer a consulta.");
+			
+			return false;
+		}
+		else
+		{
+		
+			alert("A data final tem que ser maior que a data inicial.");
+			
+			return false;
+		}
+	}
+	else if(retorno_comparacao == 5)
+	{
+		
+			alert("A data inicial não deve ser menor que 01/1900.");
+			
+		return false;
+	}	
+	return true;
+}
+
+function envia_form(data) {
+	data_aux = new Date();
+	var dia;
+	var mes;
+	
+	//dados a partir desta data aaaammdd;
+	var data_valida = 20040514;
+	var data_digitada = 0;
+	var data_user = new String(data);
+	    data_user = data_user.split("/");
+	var data_usuario = new Date(data_user[1]+"/"+data_user[0]+"/"+data_user[2])
+	var ano_user = new String(data_usuario.getFullYear());
+	var mes_user = new String(data_usuario.getMonth()+1);
+	var dia_user = new String(data_usuario.getDate());
+	
+	//adiciona 0 para mês com apenas um dígito 0-9 para a data digitada
+	if (mes_user.length < 2)
+		mes_user = "0" + mes_user;
+	//adiciona 0 para dia com apenas um dígito 0-9 para a data digitada
+	if (dia_user.length < 2)
+		dia_user = "0" + dia_user;
+
+	//converte a data digitada para inteiro no formato aaaammdd 
+	data_digitada = parseInt(ano_user+mes_user+dia_user);
+	var data_exibir = new String(data_valida);
+	dia = new String(data_aux.getDate());
+	mes = new String(data_aux.getMonth()+1);
+	
+	//adiciona 0 para dia com apenas um dígito 0-9 para a data do sistema
+	if (dia.length < 2)
+		dia = "0" + dia;
+	//adiciona 0 para mês com apenas um dígito 0-9 para a data do sistema
+	if (mes.length < 2)
+		mes = "0" + mes;
+	
+	//verifica se a data digitada é menor que a primeira data com dados disponíveis
+	if (data_digitada < data_valida)
+	{
+		
+			alert("Dados disponíveis a partir de " + data_exibir.substring(6,8) + "/" + data_exibir.substring(4,6) + "/" + data_exibir.substring(0,4));
+			
+		return false;
+	}	
+	dData2 = dia + "/" + mes + "/" + data_aux.getFullYear();
+	if(ComparaDatas(dData1,dData2) == 2)
+	{
+		
+			alert("A data digitada não deve ser maior que a data atual.");
+			
+		return false;
+	}
+	else
+	{
+		return VerificaData(data);
+	}
+}
+
+function HintText(control,text,eraseable) {
+	if(control.value == text) control.value = "";
+	else if(control.value == "") control.value = text;
+}
+
+function jump() {
+	var ElementText  = window.event.srcElement.value ;
+    if (ElementText.length == 10)
+	{
+	    document.frmBD.dData1.value='';
+	    document.frmBD.dData2.focus();
+	}
+}
+
+function keypress_number(decimal) {
+  var keypressed = window.event.keyCode;
+  var ElementText  = window.event.srcElement.value ;
+  if (keypressed == 45){
+    if (ElementText.length!=0) {
+      window.event.keyCode = 0;
+    }
+  }
+  else {
+    if (decimal) {
+      var Reg = /\./g;
+      if (Reg.test(ElementText)) {
+        if( (keypressed >= 48 && keypressed <= 57) == false) {
+          window.event.keyCode = 0;
+        }
+      }
+      else {
+        if ((keypressed >= 48 && keypressed <= 57 || keypressed == 46) == false) {
+          window.event.keyCode = 0;
+        }
+      }
+    }
+
+    else {
+      if ((keypressed >= 48 && keypressed <= 57) == false) {
+        window.event.keyCode = 0;
+      }
+    }
+  }
+}
+function Trim(sString) {
+   var sStringRetorno = new String();
+
+   sStringRetorno = sString;
+
+   if (sStringRetorno.length > 0)
+   {
+      //tira espaços da esquerda
+      while (sStringRetorno.charAt(0) == " ")
+      {
+         sStringRetorno = sStringRetorno.substring(1, sStringRetorno.length);
+      }
+
+      if (sStringRetorno.length > 0)
+      {
+         //tira espaços da direita
+         while (sStringRetorno.charAt(sStringRetorno.length - 1) == " ")
+         {
+            sStringRetorno = sStringRetorno.substring(0, sStringRetorno.length - 1);
+         }
+      }
+   }
+   return (sStringRetorno);
+}function CkDateRetroativo(campo, dData) {
+        var data = dData.substring(10, 6) + dData.substring(5, 3) + dData.substring(0, 2);
+        if (data < 20020422)
+            return false;
+        else
+            return true
+    }
+</script>
+
+</head>
+<body><!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KPF8G3"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KPF8G3');</script>
+<!-- End Google Tag Manager --><div id="divContainerIframeBmf">
+
+<form method="post" action="lum-taxas-referenciais-bmf-ptBR.asp" name="frmTxReferenciais" onsubmit="return EnviaForm();">
+<div class="row">
+<div class="large-12 columns">
+
+<div class="row">
+<div class="large-4 medium-4 columns">
+<div class="row collapse">
+<div class="large-12 columns">
+<select name="slcTaxa" onchange="Busca(this.selectedIndex)">
+
+<option value="ACC" >
+Ajuste cupom
+</option>
+
+<option value="ALD" >
+Alumínio
+</option>
+
+<option value="AN" >
+DI x Anbid
+</option>
+
+<option value="ANP" >
+Anbid x pré
+</option>
+
+<option value="APR" >
+Ajuste pré
+</option>
+
+<option value="BRP" >
+IBrX-50
+</option>
+
+<option value="CBD" >
+Cobre
+</option>
+
+<option value="DCO" >
+Cupom Cambial OC1
+</option>
+
+<option value="DIC" >
+DI x IPCA
+</option>
+
+<option value="DIM" >
+DI x IGP-M
+</option>
+
+<option value="DOC" >
+Cupom limpo
+</option>
+
+<option value="DOL" >
+DI x dólar
+</option>
+
+<option value="DP" >
+Dólar x pré
+</option>
+
+<option value="EUC" >
+DI x euro
+</option>
+
+<option value="EUR" >
+Real x euro
+</option>
+
+<option value="IAP" >
+IPCA
+</option>
+
+<option value="INP" >
+Ibovespa
+</option>
+
+<option value="IPR" >
+IGP-M
+</option>
+
+<option value="JPY" >
+Real x iene
+</option>
+
+<option value="LIB" >
+Libor
+</option>
+
+<option value="NID" >
+Níquel
+</option>
+
+<option value="PBD" >
+Chumbo
+</option>
+
+<option value="PDN" >
+Prob. não default
+</option>
+
+<option value="PRE"  selected >
+DI x pré
+</option>
+
+<option value="PTX" >
+Real x dólar
+</option>
+
+<option value="SDE" >
+Spread Libor Euro x Dólar
+</option>
+
+<option value="SLP" >
+Selic x pré
+</option>
+
+<option value="SND" >
+Estanho
+</option>
+
+<option value="TFP" >
+TBF x pré
+</option>
+
+<option value="TP" >
+TR x pré
+</option>
+
+<option value="TR" >
+DI x TR
+</option>
+
+<option value="ZND" >
+Zinco
+</option>
+
+</select>
+</div>
+</div>
+</div>
+<div class="large-4 medium-4 columns">
+<div class="row collapse">
+<div class="large-6 medium-6 small-8 columns">
+    <input type="hidden" name="Data1" id="Data1" value="20190719" />
+    <input type="text" name="Data" id="Data" class="datepicker" placeholder="dd/mm/aaaa" onkeypress="return mask_data();" value="19/07/2019" maxlength="10" />
+</div>
+<div class="large-3 medium-3 small-4 columns end">
+    <button class="button expand">OK</button>
+</div>
+</div>
+</div>
+<div class="large-4 medium-4 columns">
+<div class="row collapse">
+<div class="large-12 columns">
+    <p class="large-text-right medium-text-right small-text-left legenda">
+        <br />Atualizado em: 19/07/2019
+    </p>
+</div>
+</div>
+</div>
+</div>
+
+
+                  
+<table id="tb_principal1">
+
+
+<thead>
+<tr>
+<th rowspan="2" class="text-center">Dias Corridos</th>
+
+<th colspan="2" class="text-center">
+DI x pré
+</th>
+
+
+</tr>
+
+<th width="%" class="text-center">
+252<sup>(2)(4)</sup>
+</th>
+
+<th width="%" class="text-center">
+360<sup>(1)</sup>
+</th>
+
+</tr>
+
+</tr>
+</thead>
+<td>3</td>
+
+<td class="text-right">6,40</td>
+
+<td class="text-right">0,00</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4</td>
+
+<td class="text-right">6,40</td>
+
+<td class="text-right">4,53</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>11</td>
+
+<td class="text-right">6,40</td>
+
+<td class="text-right">5,80</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>12</td>
+
+<td class="text-right">6,40</td>
+
+<td class="text-right">6,09</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>13</td>
+
+<td class="text-right">6,40</td>
+
+<td class="text-right">6,33</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>26</td>
+
+<td class="text-right">6,21</td>
+
+<td class="text-right">6,14</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>27</td>
+
+<td class="text-right">6,20</td>
+
+<td class="text-right">6,23</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>31</td>
+
+<td class="text-right">6,18</td>
+
+<td class="text-right">5,97</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>32</td>
+
+<td class="text-right">6,17</td>
+
+<td class="text-right">6,06</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>33</td>
+
+<td class="text-right">6,16</td>
+
+<td class="text-right">6,14</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>41</td>
+
+<td class="text-right">6,13</td>
+
+<td class="text-right">6,20</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>42</td>
+
+<td class="text-right">6,13</td>
+
+<td class="text-right">6,26</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>45</td>
+
+<td class="text-right">6,13</td>
+
+<td class="text-right">6,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>59</td>
+
+<td class="text-right">6,07</td>
+
+<td class="text-right">6,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>60</td>
+
+<td class="text-right">6,06</td>
+
+<td class="text-right">6,06</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>61</td>
+
+<td class="text-right">6,06</td>
+
+<td class="text-right">6,10</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>62</td>
+
+<td class="text-right">6,06</td>
+
+<td class="text-right">6,14</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>63</td>
+
+<td class="text-right">6,05</td>
+
+<td class="text-right">6,18</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>73</td>
+
+<td class="text-right">6,03</td>
+
+<td class="text-right">6,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>74</td>
+
+<td class="text-right">6,03</td>
+
+<td class="text-right">6,05</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>88</td>
+
+<td class="text-right">5,96</td>
+
+<td class="text-right">6,00</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>89</td>
+
+<td class="text-right">5,95</td>
+
+<td class="text-right">6,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>90</td>
+
+<td class="text-right">5,95</td>
+
+<td class="text-right">6,04</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>94</td>
+
+<td class="text-right">5,94</td>
+
+<td class="text-right">5,95</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>103</td>
+
+<td class="text-right">5,90</td>
+
+<td class="text-right">5,98</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>104</td>
+
+<td class="text-right">5,90</td>
+
+<td class="text-right">6,00</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>105</td>
+
+<td class="text-right">5,90</td>
+
+<td class="text-right">6,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>122</td>
+
+<td class="text-right">5,84</td>
+
+<td class="text-right">5,81</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>133</td>
+
+<td class="text-right">5,79</td>
+
+<td class="text-right">5,85</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>136</td>
+
+<td class="text-right">5,79</td>
+
+<td class="text-right">5,78</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>150</td>
+
+<td class="text-right">5,73</td>
+
+<td class="text-right">5,73</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>152</td>
+
+<td class="text-right">5,72</td>
+
+<td class="text-right">5,75</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>153</td>
+
+<td class="text-right">5,71</td>
+
+<td class="text-right">5,76</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>154</td>
+
+<td class="text-right">5,71</td>
+
+<td class="text-right">5,77</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>161</td>
+
+<td class="text-right">5,69</td>
+
+<td class="text-right">5,70</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>164</td>
+
+<td class="text-right">5,68</td>
+
+<td class="text-right">5,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>167</td>
+
+<td class="text-right">5,68</td>
+
+<td class="text-right">5,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>180</td>
+
+<td class="text-right">5,65</td>
+
+<td class="text-right">5,60</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>196</td>
+
+<td class="text-right">5,62</td>
+
+<td class="text-right">5,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>199</td>
+
+<td class="text-right">5,62</td>
+
+<td class="text-right">5,57</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>208</td>
+
+<td class="text-right">5,60</td>
+
+<td class="text-right">5,57</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>210</td>
+
+<td class="text-right">5,59</td>
+
+<td class="text-right">5,59</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>213</td>
+
+<td class="text-right">5,59</td>
+
+<td class="text-right">5,54</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>223</td>
+
+<td class="text-right">5,57</td>
+
+<td class="text-right">5,49</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>224</td>
+
+<td class="text-right">5,56</td>
+
+<td class="text-right">5,50</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>227</td>
+
+<td class="text-right">5,56</td>
+
+<td class="text-right">5,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>241</td>
+
+<td class="text-right">5,55</td>
+
+<td class="text-right">5,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>245</td>
+
+<td class="text-right">5,55</td>
+
+<td class="text-right">5,50</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>248</td>
+
+<td class="text-right">5,55</td>
+
+<td class="text-right">5,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>256</td>
+
+<td class="text-right">5,54</td>
+
+<td class="text-right">5,47</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>257</td>
+
+<td class="text-right">5,54</td>
+
+<td class="text-right">5,48</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>270</td>
+
+<td class="text-right">5,54</td>
+
+<td class="text-right">5,45</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>271</td>
+
+<td class="text-right">5,54</td>
+
+<td class="text-right">5,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>285</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>290</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,39</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>300</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>301</td>
+
+<td class="text-right">5,52</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>307</td>
+
+<td class="text-right">5,52</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>315</td>
+
+<td class="text-right">5,52</td>
+
+<td class="text-right">5,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>318</td>
+
+<td class="text-right">5,52</td>
+
+<td class="text-right">5,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>332</td>
+
+<td class="text-right">5,51</td>
+
+<td class="text-right">5,38</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>334</td>
+
+<td class="text-right">5,51</td>
+
+<td class="text-right">5,39</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>335</td>
+
+<td class="text-right">5,51</td>
+
+<td class="text-right">5,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>348</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,39</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>360</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,39</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>362</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>381</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>390</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>395</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>410</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>420</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>424</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>431</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>440</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>452</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>453</td>
+
+<td class="text-right">5,50</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>454</td>
+
+<td class="text-right">5,51</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>480</td>
+
+<td class="text-right">5,51</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>486</td>
+
+<td class="text-right">5,52</td>
+
+<td class="text-right">5,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>510</td>
+
+<td class="text-right">5,52</td>
+
+<td class="text-right">5,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>516</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>518</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,45</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>529</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>535</td>
+
+<td class="text-right">5,53</td>
+
+<td class="text-right">5,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>542</td>
+
+<td class="text-right">5,54</td>
+
+<td class="text-right">5,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>546</td>
+
+<td class="text-right">5,54</td>
+
+<td class="text-right">5,45</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>570</td>
+
+<td class="text-right">5,57</td>
+
+<td class="text-right">5,47</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>579</td>
+
+<td class="text-right">5,57</td>
+
+<td class="text-right">5,45</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>591</td>
+
+<td class="text-right">5,58</td>
+
+<td class="text-right">5,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>600</td>
+
+<td class="text-right">5,59</td>
+
+<td class="text-right">5,48</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>605</td>
+
+<td class="text-right">5,60</td>
+
+<td class="text-right">5,48</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>622</td>
+
+<td class="text-right">5,61</td>
+
+<td class="text-right">5,51</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>630</td>
+
+<td class="text-right">5,62</td>
+
+<td class="text-right">5,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>635</td>
+
+<td class="text-right">5,63</td>
+
+<td class="text-right">5,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>636</td>
+
+<td class="text-right">5,63</td>
+
+<td class="text-right">5,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>654</td>
+
+<td class="text-right">5,65</td>
+
+<td class="text-right">5,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>661</td>
+
+<td class="text-right">5,66</td>
+
+<td class="text-right">5,54</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>668</td>
+
+<td class="text-right">5,67</td>
+
+<td class="text-right">5,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>690</td>
+
+<td class="text-right">5,69</td>
+
+<td class="text-right">5,57</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>713</td>
+
+<td class="text-right">5,72</td>
+
+<td class="text-right">5,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>720</td>
+
+<td class="text-right">5,73</td>
+
+<td class="text-right">5,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>727</td>
+
+<td class="text-right">5,74</td>
+
+<td class="text-right">5,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>752</td>
+
+<td class="text-right">5,78</td>
+
+<td class="text-right">5,67</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>759</td>
+
+<td class="text-right">5,79</td>
+
+<td class="text-right">5,68</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>775</td>
+
+<td class="text-right">5,81</td>
+
+<td class="text-right">5,72</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>780</td>
+
+<td class="text-right">5,82</td>
+
+<td class="text-right">5,72</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>789</td>
+
+<td class="text-right">5,83</td>
+
+<td class="text-right">5,73</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>805</td>
+
+<td class="text-right">5,85</td>
+
+<td class="text-right">5,76</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>810</td>
+
+<td class="text-right">5,86</td>
+
+<td class="text-right">5,76</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>819</td>
+
+<td class="text-right">5,86</td>
+
+<td class="text-right">5,77</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>840</td>
+
+<td class="text-right">5,89</td>
+
+<td class="text-right">5,78</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>851</td>
+
+<td class="text-right">5,89</td>
+
+<td class="text-right">5,77</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>871</td>
+
+<td class="text-right">5,91</td>
+
+<td class="text-right">5,80</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>899</td>
+
+<td class="text-right">5,94</td>
+
+<td class="text-right">5,83</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>900</td>
+
+<td class="text-right">5,94</td>
+
+<td class="text-right">5,84</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>913</td>
+
+<td class="text-right">5,96</td>
+
+<td class="text-right">5,85</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>930</td>
+
+<td class="text-right">5,98</td>
+
+<td class="text-right">5,88</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>942</td>
+
+<td class="text-right">5,99</td>
+
+<td class="text-right">5,89</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>957</td>
+
+<td class="text-right">6,01</td>
+
+<td class="text-right">5,90</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>962</td>
+
+<td class="text-right">6,01</td>
+
+<td class="text-right">5,90</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>970</td>
+
+<td class="text-right">6,02</td>
+
+<td class="text-right">5,91</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>987</td>
+
+<td class="text-right">6,04</td>
+
+<td class="text-right">5,94</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>990</td>
+
+<td class="text-right">6,04</td>
+
+<td class="text-right">5,93</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1004</td>
+
+<td class="text-right">6,06</td>
+
+<td class="text-right">5,95</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1020</td>
+
+<td class="text-right">6,08</td>
+
+<td class="text-right">5,97</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1032</td>
+
+<td class="text-right">6,10</td>
+
+<td class="text-right">5,98</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1050</td>
+
+<td class="text-right">6,13</td>
+
+<td class="text-right">6,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1078</td>
+
+<td class="text-right">6,16</td>
+
+<td class="text-right">6,05</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1081</td>
+
+<td class="text-right">6,16</td>
+
+<td class="text-right">6,05</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1092</td>
+
+<td class="text-right">6,18</td>
+
+<td class="text-right">6,07</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1110</td>
+
+<td class="text-right">6,20</td>
+
+<td class="text-right">6,09</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1123</td>
+
+<td class="text-right">6,22</td>
+
+<td class="text-right">6,11</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1140</td>
+
+<td class="text-right">6,24</td>
+
+<td class="text-right">6,14</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1154</td>
+
+<td class="text-right">6,25</td>
+
+<td class="text-right">6,15</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1172</td>
+
+<td class="text-right">6,27</td>
+
+<td class="text-right">6,16</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1186</td>
+
+<td class="text-right">6,29</td>
+
+<td class="text-right">6,18</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1200</td>
+
+<td class="text-right">6,31</td>
+
+<td class="text-right">6,20</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1216</td>
+
+<td class="text-right">6,32</td>
+
+<td class="text-right">6,21</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1263</td>
+
+<td class="text-right">6,38</td>
+
+<td class="text-right">6,27</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1277</td>
+
+<td class="text-right">6,40</td>
+
+<td class="text-right">6,29</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1307</td>
+
+<td class="text-right">6,44</td>
+
+<td class="text-right">6,34</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1321</td>
+
+<td class="text-right">6,45</td>
+
+<td class="text-right">6,34</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1335</td>
+
+<td class="text-right">6,47</td>
+
+<td class="text-right">6,36</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1354</td>
+
+<td class="text-right">6,49</td>
+
+<td class="text-right">6,38</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1368</td>
+
+<td class="text-right">6,50</td>
+
+<td class="text-right">6,39</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1396</td>
+
+<td class="text-right">6,53</td>
+
+<td class="text-right">6,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1427</td>
+
+<td class="text-right">6,56</td>
+
+<td class="text-right">6,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1440</td>
+
+<td class="text-right">6,58</td>
+
+<td class="text-right">6,45</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1445</td>
+
+<td class="text-right">6,58</td>
+
+<td class="text-right">6,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1459</td>
+
+<td class="text-right">6,59</td>
+
+<td class="text-right">6,47</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1488</td>
+
+<td class="text-right">6,62</td>
+
+<td class="text-right">6,50</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1505</td>
+
+<td class="text-right">6,64</td>
+
+<td class="text-right">6,53</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1536</td>
+
+<td class="text-right">6,66</td>
+
+<td class="text-right">6,54</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1550</td>
+
+<td class="text-right">6,67</td>
+
+<td class="text-right">6,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1581</td>
+
+<td class="text-right">6,69</td>
+
+<td class="text-right">6,56</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1628</td>
+
+<td class="text-right">6,71</td>
+
+<td class="text-right">6,58</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1672</td>
+
+<td class="text-right">6,73</td>
+
+<td class="text-right">6,60</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1718</td>
+
+<td class="text-right">6,75</td>
+
+<td class="text-right">6,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1732</td>
+
+<td class="text-right">6,76</td>
+
+<td class="text-right">6,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1762</td>
+
+<td class="text-right">6,79</td>
+
+<td class="text-right">6,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1802</td>
+
+<td class="text-right">6,82</td>
+
+<td class="text-right">6,68</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1809</td>
+
+<td class="text-right">6,83</td>
+
+<td class="text-right">6,69</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1854</td>
+
+<td class="text-right">6,86</td>
+
+<td class="text-right">6,73</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1949</td>
+
+<td class="text-right">6,92</td>
+
+<td class="text-right">6,79</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>1994</td>
+
+<td class="text-right">6,94</td>
+
+<td class="text-right">6,82</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2040</td>
+
+<td class="text-right">6,97</td>
+
+<td class="text-right">6,84</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2114</td>
+
+<td class="text-right">7,00</td>
+
+<td class="text-right">6,87</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2127</td>
+
+<td class="text-right">7,01</td>
+
+<td class="text-right">6,88</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2160</td>
+
+<td class="text-right">7,03</td>
+
+<td class="text-right">6,90</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2174</td>
+
+<td class="text-right">7,03</td>
+
+<td class="text-right">6,90</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2219</td>
+
+<td class="text-right">7,06</td>
+
+<td class="text-right">6,93</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2313</td>
+
+<td class="text-right">7,11</td>
+
+<td class="text-right">6,99</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2359</td>
+
+<td class="text-right">7,13</td>
+
+<td class="text-right">7,01</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2406</td>
+
+<td class="text-right">7,14</td>
+
+<td class="text-right">7,02</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2492</td>
+
+<td class="text-right">7,17</td>
+
+<td class="text-right">7,04</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2520</td>
+
+<td class="text-right">7,18</td>
+
+<td class="text-right">7,05</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2539</td>
+
+<td class="text-right">7,18</td>
+
+<td class="text-right">7,05</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2586</td>
+
+<td class="text-right">7,21</td>
+
+<td class="text-right">7,08</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2677</td>
+
+<td class="text-right">7,26</td>
+
+<td class="text-right">7,13</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2726</td>
+
+<td class="text-right">7,28</td>
+
+<td class="text-right">7,15</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2768</td>
+
+<td class="text-right">7,30</td>
+
+<td class="text-right">7,16</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2859</td>
+
+<td class="text-right">7,33</td>
+
+<td class="text-right">7,20</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2880</td>
+
+<td class="text-right">7,34</td>
+
+<td class="text-right">7,21</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2904</td>
+
+<td class="text-right">7,35</td>
+
+<td class="text-right">7,22</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>2950</td>
+
+<td class="text-right">7,37</td>
+
+<td class="text-right">7,24</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3042</td>
+
+<td class="text-right">7,40</td>
+
+<td class="text-right">7,26</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3090</td>
+
+<td class="text-right">7,42</td>
+
+<td class="text-right">7,28</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3133</td>
+
+<td class="text-right">7,43</td>
+
+<td class="text-right">7,30</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3223</td>
+
+<td class="text-right">7,46</td>
+
+<td class="text-right">7,32</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3240</td>
+
+<td class="text-right">7,46</td>
+
+<td class="text-right">7,33</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3272</td>
+
+<td class="text-right">7,47</td>
+
+<td class="text-right">7,33</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3315</td>
+
+<td class="text-right">7,48</td>
+
+<td class="text-right">7,35</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3408</td>
+
+<td class="text-right">7,51</td>
+
+<td class="text-right">7,37</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3455</td>
+
+<td class="text-right">7,52</td>
+
+<td class="text-right">7,38</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3499</td>
+
+<td class="text-right">7,53</td>
+
+<td class="text-right">7,39</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3588</td>
+
+<td class="text-right">7,54</td>
+
+<td class="text-right">7,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3601</td>
+
+<td class="text-right">7,54</td>
+
+<td class="text-right">7,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3636</td>
+
+<td class="text-right">7,55</td>
+
+<td class="text-right">7,40</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3666</td>
+
+<td class="text-right">7,55</td>
+
+<td class="text-right">7,41</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3680</td>
+
+<td class="text-right">7,55</td>
+
+<td class="text-right">7,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3773</td>
+
+<td class="text-right">7,56</td>
+
+<td class="text-right">7,42</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3820</td>
+
+<td class="text-right">7,57</td>
+
+<td class="text-right">7,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3864</td>
+
+<td class="text-right">7,57</td>
+
+<td class="text-right">7,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3909</td>
+
+<td class="text-right">7,58</td>
+
+<td class="text-right">7,43</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3953</td>
+
+<td class="text-right">7,58</td>
+
+<td class="text-right">7,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>3960</td>
+
+<td class="text-right">7,58</td>
+
+<td class="text-right">7,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4000</td>
+
+<td class="text-right">7,59</td>
+
+<td class="text-right">7,44</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4045</td>
+
+<td class="text-right">7,59</td>
+
+<td class="text-right">7,45</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4140</td>
+
+<td class="text-right">7,60</td>
+
+<td class="text-right">7,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4185</td>
+
+<td class="text-right">7,60</td>
+
+<td class="text-right">7,46</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4231</td>
+
+<td class="text-right">7,61</td>
+
+<td class="text-right">7,47</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4318</td>
+
+<td class="text-right">7,61</td>
+
+<td class="text-right">7,47</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4322</td>
+
+<td class="text-right">7,61</td>
+
+<td class="text-right">7,47</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4410</td>
+
+<td class="text-right">7,62</td>
+
+<td class="text-right">7,48</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4504</td>
+
+<td class="text-right">7,63</td>
+
+<td class="text-right">7,49</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4595</td>
+
+<td class="text-right">7,63</td>
+
+<td class="text-right">7,49</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4680</td>
+
+<td class="text-right">7,64</td>
+
+<td class="text-right">7,50</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4686</td>
+
+<td class="text-right">7,64</td>
+
+<td class="text-right">7,50</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4777</td>
+
+<td class="text-right">7,64</td>
+
+<td class="text-right">7,51</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4869</td>
+
+<td class="text-right">7,65</td>
+
+<td class="text-right">7,51</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>4960</td>
+
+<td class="text-right">7,65</td>
+
+<td class="text-right">7,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5040</td>
+
+<td class="text-right">7,66</td>
+
+<td class="text-right">7,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5050</td>
+
+<td class="text-right">7,66</td>
+
+<td class="text-right">7,52</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5141</td>
+
+<td class="text-right">7,66</td>
+
+<td class="text-right">7,53</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5234</td>
+
+<td class="text-right">7,67</td>
+
+<td class="text-right">7,53</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5325</td>
+
+<td class="text-right">7,67</td>
+
+<td class="text-right">7,54</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5401</td>
+
+<td class="text-right">7,68</td>
+
+<td class="text-right">7,54</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5414</td>
+
+<td class="text-right">7,68</td>
+
+<td class="text-right">7,54</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5506</td>
+
+<td class="text-right">7,68</td>
+
+<td class="text-right">7,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5582</td>
+
+<td class="text-right">7,69</td>
+
+<td class="text-right">7,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5599</td>
+
+<td class="text-right">7,69</td>
+
+<td class="text-right">7,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5690</td>
+
+<td class="text-right">7,69</td>
+
+<td class="text-right">7,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5779</td>
+
+<td class="text-right">7,69</td>
+
+<td class="text-right">7,55</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5871</td>
+
+<td class="text-right">7,70</td>
+
+<td class="text-right">7,56</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>5964</td>
+
+<td class="text-right">7,70</td>
+
+<td class="text-right">7,56</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6055</td>
+
+<td class="text-right">7,71</td>
+
+<td class="text-right">7,57</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6145</td>
+
+<td class="text-right">7,71</td>
+
+<td class="text-right">7,56</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6237</td>
+
+<td class="text-right">7,71</td>
+
+<td class="text-right">7,57</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6331</td>
+
+<td class="text-right">7,72</td>
+
+<td class="text-right">7,58</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6424</td>
+
+<td class="text-right">7,72</td>
+
+<td class="text-right">7,58</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6510</td>
+
+<td class="text-right">7,72</td>
+
+<td class="text-right">7,58</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6604</td>
+
+<td class="text-right">7,72</td>
+
+<td class="text-right">7,58</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6695</td>
+
+<td class="text-right">7,73</td>
+
+<td class="text-right">7,59</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6786</td>
+
+<td class="text-right">7,73</td>
+
+<td class="text-right">7,59</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6877</td>
+
+<td class="text-right">7,73</td>
+
+<td class="text-right">7,59</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>6968</td>
+
+<td class="text-right">7,74</td>
+
+<td class="text-right">7,59</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7060</td>
+
+<td class="text-right">7,74</td>
+
+<td class="text-right">7,59</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7151</td>
+
+<td class="text-right">7,74</td>
+
+<td class="text-right">7,60</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7200</td>
+
+<td class="text-right">7,74</td>
+
+<td class="text-right">7,60</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7241</td>
+
+<td class="text-right">7,74</td>
+
+<td class="text-right">7,60</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7332</td>
+
+<td class="text-right">7,75</td>
+
+<td class="text-right">7,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7425</td>
+
+<td class="text-right">7,75</td>
+
+<td class="text-right">7,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7516</td>
+
+<td class="text-right">7,75</td>
+
+<td class="text-right">7,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7606</td>
+
+<td class="text-right">7,75</td>
+
+<td class="text-right">7,61</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7698</td>
+
+<td class="text-right">7,75</td>
+
+<td class="text-right">7,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7791</td>
+
+<td class="text-right">7,76</td>
+
+<td class="text-right">7,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7882</td>
+
+<td class="text-right">7,76</td>
+
+<td class="text-right">7,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>7971</td>
+
+<td class="text-right">7,76</td>
+
+<td class="text-right">7,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8063</td>
+
+<td class="text-right">7,76</td>
+
+<td class="text-right">7,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8158</td>
+
+<td class="text-right">7,76</td>
+
+<td class="text-right">7,62</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8251</td>
+
+<td class="text-right">7,77</td>
+
+<td class="text-right">7,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8336</td>
+
+<td class="text-right">7,77</td>
+
+<td class="text-right">7,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8428</td>
+
+<td class="text-right">7,77</td>
+
+<td class="text-right">7,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8522</td>
+
+<td class="text-right">7,77</td>
+
+<td class="text-right">7,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8613</td>
+
+<td class="text-right">7,77</td>
+
+<td class="text-right">7,63</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8701</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8795</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8886</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>8977</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9000</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9068</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9159</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9252</td>
+
+<td class="text-right">7,78</td>
+
+<td class="text-right">7,64</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9343</td>
+
+<td class="text-right">7,79</td>
+
+<td class="text-right">7,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9432</td>
+
+<td class="text-right">7,79</td>
+
+<td class="text-right">7,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9524</td>
+
+<td class="text-right">7,79</td>
+
+<td class="text-right">7,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9708</td>
+
+<td class="text-right">7,79</td>
+
+<td class="text-right">7,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>9889</td>
+
+<td class="text-right">7,79</td>
+
+<td class="text-right">7,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10073</td>
+
+<td class="text-right">7,80</td>
+
+<td class="text-right">7,65</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10254</td>
+
+<td class="text-right">7,80</td>
+
+<td class="text-right">7,66</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10442</td>
+
+<td class="text-right">7,80</td>
+
+<td class="text-right">7,66</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10622</td>
+
+<td class="text-right">7,80</td>
+
+<td class="text-right">7,66</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10800</td>
+
+<td class="text-right">7,81</td>
+
+<td class="text-right">7,66</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10804</td>
+
+<td class="text-right">7,81</td>
+
+<td class="text-right">7,66</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>10986</td>
+
+<td class="text-right">7,81</td>
+
+<td class="text-right">7,67</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>11169</td>
+
+<td class="text-right">7,81</td>
+
+<td class="text-right">7,67</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>11350</td>
+
+<td class="text-right">7,81</td>
+
+<td class="text-right">7,67</td>
+
+</tr>
+
+</tr>
+</thead>
+<td>13086</td>
+
+<td class="text-right">7,83</td>
+
+<td class="text-right">7,69</td>
+
+</tr>
+
+</table>
+
+
+<p class="legenda">
+(1) Taxa efetiva para 360 dias corridos.<br />
+(2) Taxa efetiva para 252 dias úteis.<br />
+(3) Taxa linear para 360 dias corridos.<br />
+(4) Taxa utilizada na apuração do risco de crédito das operações de <i>swap</i>, de que tratam a Resolução 2399/97 e a Circular 2771/97, do Bacen.<br />
+(5) Os valores divulgados são obtidos com base em expectativa, não em arbitragem.<br />
+(6) Ajuste cupom - Curva gerada a partir da interpolação dos preços de ajuste do contrato futuro de cupom cambial.<br />
+(7) Ajuste pré - Curva gerada a partir da interpolação dos preços de ajuste do contrato futuro de DI.
+</p>
+<div class="row" id="lumis-taxas-ref-br">
+<div class="large-12 columns">
+<div class="list-avatar">
+    <div class="list-avatar-row">
+        <div class="primary-action">
+            <img src="/pages/portal/bmfbovespa/lumis/img/ic_cloud_download_black_48dp.png" alt="" />
+        </div>
+        <div class="content">
+            <p class="primary-text"><a href="#" onClick="salvaxls()">Download</a>
+        </div>
+    </div>
+    <div class="divider"></div>
+</div>
+</div>
+</div>
+
+<input type="hidden" name="convertexls1" />
+
+<input type="hidden" name="nomexls" />
+<input type="hidden" name="lQtdTabelas" />
+<input type="hidden" name="IDIOMA" value="1" />
+</div>
+</div>
+
+
+</form>
+</div>
+
+<script language="javascript" type="text/javascript" >
+	window.onload = function() {
+		try {
+			
+			if (navigator.userAgent.indexOf("Chrome") > - 1)
+				var parentURL = document.location.ancestorOrigins[0];
+			else
+				var parentURL = document.referrer;
+											
+			if (parentURL.indexOf(window.location.hostname) > -1 || parentURL.indexOf("bmfbovespa.com.br") > -1)
+			{
+				document.getElementById("lumis-taxas-ref-br").style.display = "block";
+			}
+			else
+			{
+				document.getElementById("lumis-taxas-ref-br").style.display = "none";				
+			}
+		}
+		catch (ex) {
+		}
+	}
+</script>
+	
+<script type="text/javascript">
+
+function mask_data() {
+	var keypressed = window.event.keyCode;
+	var ElementText  = window.event.srcElement.value ;
+	if( !(keypressed >= 47 && keypressed <= 57)) {
+		window.event.keyCode = 0;
+		return;
+    }
+	if (keypressed == 47){
+		if ((ElementText.length != 2) && (ElementText.length != 5)){
+			window.event.keyCode = 0;
+			return;
+		}
+	}
+	else{
+		if (ElementText.length == 2 || ElementText.length == 5){
+			window.event.srcElement.value += '/';
+		}
+	}
+}
+
+function ValidaData(data) {
+	var dia = data.substring(0,2);
+	var mes = parseInt(data.substring(3,5),10)-1;
+	var ano = data.substring(6,10);
+	var d = new Date(ano,mes,dia);
+	var d1 = new Date(2023,9-1,12);
+
+	return (
+		(dia == d.getDate()) &&
+	 	(mes == d.getMonth()) &&
+		(ano == d.getFullYear()) &&
+		(ano >= 1900) &&
+		(d <= d1)
+	);
+}
+
+function EnviaForm() {
+	if (document.frmTxReferenciais.Data.value != '') {
+		if (ValidaData(document.frmTxReferenciais.Data.value))
+		{
+			var Data = document.frmTxReferenciais.Data.value;
+			var Data1 = document.frmTxReferenciais.Data1.value;
+			var slcTaxa = document.frmTxReferenciais.slcTaxa.value;
+			document.frmTxReferenciais.action = "lum-taxas-referenciais-bmf-ptBR.asp" + "?Data=" + Data + "&Data1=" + Data1 + "&slcTaxa=" + slcTaxa;
+			document.frmTxReferenciais.submit();
+			return true;
+		}
+		else
+		{
+			alert ('Data Invalida');
+			return false;
+		}
+	}
+}
+function salvaxls() {
+	var lQtdTabelas = '1';
+	lQtdTabelas= parseInt(lQtdTabelas);
+	if(!isNaN(lQtdTabelas))	{
+		for(var i=1;i<lQtdTabelas+1;i++){
+			eval('document.frmTxReferenciais.convertexls' + i ).value = document.all['tb_principal' + i].innerHTML;
+		}
+		document.frmTxReferenciais.lQtdTabelas.value=lQtdTabelas;
+		document.frmTxReferenciais.action = 'GeraXlsTx.asp';
+		document.frmTxReferenciais.nomexls.value = 'PRE20190719';
+		document.frmTxReferenciais.submit();
+	}
+}
+
+function Busca(Indice) {
+    if (Indice != "23")
+	{
+		var Data = document.frmTxReferenciais.Data.value;
+		var Data1 = document.frmTxReferenciais.Data1.value;
+		var slcTaxa = document.frmTxReferenciais.slcTaxa.value;
+		document.frmTxReferenciais.action = "lum-taxas-referenciais-bmf-ptBR.asp" + "?Data=" + Data + "&Data1=" + Data1 + "&slcTaxa=" + slcTaxa;
+		document.frmTxReferenciais.submit();
+	}
+	else
+	{
+		document.location.href = "lum-taxas-referenciais-bmf-ptBR.asp";
+	}
+}
+
+function ImpremePagina() {
+	var pageLocal;
+	pageLocal = toString(document.location);
+	if((eval("'"+ document.location +"'.indexOf('?')"))>(0))
+	{
+		window.open(document.location +"&"+ "printThis=True", "JanelaImpreme");
+	}
+	else
+	{
+		window.open(document.location +"?"+ "printThis=True", "JanelaImpreme");
+	}
+}
+</script>
+<input type="hidden" id="origem" />
+<script src="js/vendor/jquery.js"></script>
+<script src="js/foundation.min.js"></script>
+<script src="js/responsive.tables.min.js"></script>
+
+<script src="js/jquery.ui.core.js"></script>
+<script src="js/jquery.ui.datepicker.js"></script>
+
+    <script>
+        $(document).foundation();
+        $(".datepicker").datepicker();
+        $("table").addClass("responsive");
+    
+    </script>       
+	
+
+	<script type="text/javascript">
+
+		window.addEventListener('click', iframe_resize);
+
+		function iframe_resize() {            
+			var height = 0;
+			height = $("#divContainerIframeBmf").height() + 24;
+
+			if (parent.postMessage) 
+			{
+				if (getParameterByName("origem") != null && getParameterByName("origem") != "")
+				{
+					var parentURL = getParameterByName("origem");
+				}
+				else
+				{					
+					if (navigator.userAgent.indexOf("Chrome") > - 1)
+						var parentURL = document.location.ancestorOrigins[0];
+					else
+						var parentURL = document.referrer;					
+				}				
+				document.getElementById("origem").value = parentURL;				
+					
+				if (parentURL != undefined)
+				{
+					parent.postMessage(height, "https://www.b3.com.br");
+				}
+							
+			}	
+		}
+
+		function getParameterByName(name, url) {
+			if (!url) url = window.location.href;
+			name = name.replace(/[\[\]]/g, "\\$&");
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+			results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		}		
+	</script>
+	<script type="text/javascript">iframe_resize();</script>
+<script src="js/jquery.ui.datepicker-pt-BR.js"></script>
+</body>
+</html>
+
+
+
+

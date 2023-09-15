@@ -1,0 +1,769 @@
+---
+title: "rb3"
+author: "Wilson Freitas"
+format:
+  revealjs:
+    preview-links: auto
+    footer: "Wilson Freitas"
+editor: visual
+---
+
+## Agenda
+
+- Missão
+- Um pouco de história
+- O que o 📦 `{rb3}` tem?
+- Aplicações
+
+## Missão
+
+<center>
+
+<br/>
+<br/>
+<br/>
+
+Prover acesso estruturado a todo conteúdo útil disponível no site da [B3](http://www.b3.com.br).
+
+</center>
+
+## Um pouco de história
+
+::: incremental
+- O `{rb3}` nasceu como `{rbmfbovespa}` com o objetivo de ler os arquivos disponíveis no site da Bolsa.
+- Esse pacote nunca foi para o CRAN.
+- Em abril/2022, Perlin me procurou pra colocar uma função para fazer download da curva de juros da Bolsa (então B3) no pacote `{fixedincome}`.
+- Nasce `{rb3}` como continuação do `{rbmfbovespa}` com o Perlin integrando o projeto.
+- Em 2023 o projeto foi aceito no **rOpenSci**
+:::
+
+## O que o 📦 `{rb3}` tem? {.smaller}
+
+::: incremental
+- Curvas de juros: juros nominais (prefixados), juros reais, cupom cambial
+- Preços de ajuste de contratos futuros: DI1, DOL, IND, DAP, ...
+- Cotações diárias não ajustadas: ações, BDRs, ETFs, FIIs, FIAGROs, ...
+- Prêmio de opções de ações
+- Séries históricas de índices: IBOV, IBXL, IBXX, SMLL, ...
+- Composição e pesos de ações nos índices
+- Segmentos das ações
+- Eventos corporativos de empresas: dividendos, subscrição, grupamento, desdobramento, ...
+- Cache
+:::
+
+## Curvas de juros
+
+- As curvas de juros estão disponíveis na página 
+  [Taxas Referenciais da B3](https://www.b3.com.br/pt_br/market-data-e-indices/servicos-de-dados/market-data/consultas/mercado-de-derivativos/precos-referenciais/taxas-referenciais-bm-fbovespa/){preview-link="true" style="text-align: center"}
+
+::: incremental
+- Histórico começa em 2018
+:::
+  
+::: {.fragment}
+::: columns
+::: {.columns width="50%"}
+- `yc_get()`
+- `yc_ipca_get()`
+- `yc_usd_get()`
+:::
+::: {.columns width="50%"}
+- `yc_mget()`
+- `yc_ipca_mget()`
+- `yc_usd_mget()`
+:::
+:::
+:::
+
+
+## Curva de juros nominais (prefixados) {.smaller}
+
+```{.r code-line-numbers="1|3-7|9"}
+library(rb3)
+
+df_yc <- yc_mget(
+  first_date = Sys.Date() - 255 * 5,
+  last_date = Sys.Date(),
+  by = 255
+)
+
+df_yc
+```
+
+::: {.fragment .fade-in}
+```{r}
+library(rb3)
+
+df_yc <- yc_mget(
+  first_date = Sys.Date() - 255 * 5,
+  last_date = Sys.Date(),
+  by = 255
+)
+
+df_yc
+```
+:::
+
+## Curvas de juros nominais (prefixados) {.smaller}
+
+```{r}
+#| echo: true
+#| code-fold: true
+library(tidyverse)
+
+ggplot(
+  df_yc,
+  aes(x = forward_date, y = r_252, group = refdate, color = factor(refdate))
+) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Yield Curves for Brazil",
+    subtitle = "Built using interest rates future contracts",
+    caption = str_glue("Data imported using rb3 at {Sys.Date()}"),
+    x = "Forward Date",
+    y = "Annual Interest Rate",
+    color = "Reference Date"
+  ) +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent)
+```
+
+## Curva de juros reais (cupom de IPCA) {.smaller}
+
+```{r}
+#| echo: true
+#| code-fold: true
+df_ipca_yc <- yc_ipca_mget(
+  first_date = Sys.Date() - 255 * 5,
+  last_date = Sys.Date(),
+  by = 255
+)
+
+ggplot(
+  df_ipca_yc,
+  aes(x = forward_date, y = r_252, group = refdate, color = factor(refdate))
+) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "DIxIPCA Yield Curves for Brazil",
+    subtitle = "Built using interest rates future contracts",
+    caption = str_glue("Data imported using rb3 at {Sys.Date()}"),
+    x = "Forward Date",
+    y = "Annual Interest Rate",
+    color = "Reference Date"
+  ) +
+  theme_light() + 
+  scale_y_continuous(labels = scales::percent)
+```
+
+## Inflação Implícita
+
+```{r}
+#| echo: true
+pre_factor <- df_yc |>
+  mutate(factor_pre = (1 + r_252) ^ (biz_days/252)) |>
+  select(refdate, forward_date, biz_days, factor_pre)
+
+ipca_factor <- df_ipca_yc |>
+  mutate(factor_ipca = (1 + r_252) ^ (biz_days/252)) |>
+  select(refdate, forward_date, biz_days, factor_ipca)
+
+inflation <- pre_factor |>
+  left_join(ipca_factor,
+            by = c("refdate", "forward_date", "biz_days")) |>
+  mutate(
+    inflation = (factor_pre / factor_ipca) ^ (252 / biz_days) - 1
+  )
+```
+
+
+## Inflação Implícita {.smaller}
+
+```{r}
+#| echo: true
+#| code-fold: true
+ggplot(
+  inflation |> filter(forward_date < as.Date("2034-01-01")),
+  aes(
+    x = forward_date,
+    y = inflation,
+    group = refdate,
+    color = factor(refdate)
+  )
+) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Implied Inflation for Brazil",
+    subtitle = "Built using interest rates future contracts",
+    caption = str_glue("Data imported using rb3 at {Sys.Date()}"),
+    x = "Forward Date",
+    y = "Annual Interest Rate",
+    color = "Reference Date"
+  ) +
+  theme_light() +
+  scale_y_continuous(labels = scales::percent)
+```
+
+## Contratos Futuros
+
+- Os preços de ajuste de contratos futuros estão disponíveis na página
+  [Ajustes do pregão da B3](https://www.b3.com.br/pt_br/market-data-e-indices/servicos-de-dados/market-data/historico/derivativos/ajustes-do-pregao/){preview-link="true" style="text-align: center"}
+
+::: incremental
+- Histórico começa em 1990
+:::
+  
+::: {.fragment}
+- `futures_get()`
+- `futures_mget()`
+:::
+
+
+## Contratos Futuros de DI1 {.smaller}
+
+- A curva de juros nominais é construída a partir dos contratos futuros de DI1
+
+```{r}
+#| echo: true
+fut <- futures_get("2023-09-01")
+fut |> filter(commodity == "DI1") |> head(15)
+```
+
+## Contratos Futuros de DI1 + Curva de juros prefixado {.smaller}
+
+- Como identificar os contratos de DI1 na curva de juros prefixados?
+
+::: {.fragment}
+<center>
+**Super dataset**
+</center>
+:::
+
+::: {.fragment}
+```{r}
+#| echo: true
+yc <- yc_get("2023-09-01")
+fut <- futures_get("2023-09-01")
+df <- yc_superset(yc, fut)
+df |> head(10)
+```
+:::
+
+## Construindo a curva de juros prefixados {.smaller}
+
+Com o pacote `{fixedincome}` podemos construir a curva de juros prefixados a
+partir dos contratos futuros de DI1.
+
+::: {.fragment}
+```{r}
+#| echo: true
+df_curve <- bind_rows(
+  df |> filter(biz_days == 1) |> select(biz_days, r_252),
+  df |> filter(!is.na(symbol)) |> select(biz_days, r_252)
+)
+```
+:::
+
+<br/>
+
+::: {.fragment}
+```{r}
+#| echo: true
+library(fixedincome)
+
+curve <- spotratecurve(
+  df_curve$r_252, df_curve$biz_days, "discrete", "business/252", "Brazil/ANBIMA",
+  refdate = as.Date("2023-09-01")
+)
+```
+:::
+
+## Curva de juros prefixados {.smaller}
+
+```{r}
+#| echo: true
+ggspotratecurveplot(curve)
+```
+
+## Cache do 📦 `{rb3}`
+
+- O sistema de cache do `{rb3}` armazena todos os arquivos baixados e processados
+  em um diretório (opção `rb3.cachedir`)
+
+```{.r}
+options(rb3.cachedir = file.path("C:\\Users\\wilso\\R", "rb3-cache"))
+```
+
+::: incremental
+- O cache pode ser utilizado como um *banco de dados* __rudimentar__.
+- Todas as funções possuem os argumentos:
+  - `cache_folder = cachedir()` 
+  - `do_cache = TRUE`
+:::
+
+## Histórico de juros prefixados de longo prazo {.smaller}
+
+```{r cache=TRUE}
+#| echo: true
+dc <- yc_mget(
+    first_date = "2019-01-01",
+    last_date = "2023-09-01",
+    cache_folder = "rb3-data"
+)
+```
+
+<br/>
+
+::: {.fragment}
+```{.r code-line-numbers="2-4|5-10|11"}
+unique(dc$refdate) |> map(function(date, df) {
+    df_curve <- df |>
+        filter(refdate == date, biz_days > 0) |>
+        filter(!duplicated(biz_days))
+    curve <- spotratecurve(
+        df_curve$r_252,
+        df_curve$biz_days,
+        "discrete", "business/252", "Brazil/ANBIMA",
+        refdate = date
+    )
+    interpolation(curve) <- interp_flatforward()
+    curve
+}, df = dc) -> curves
+```
+:::
+
+```{r cache=TRUE}
+unique(dc$refdate) |> map(function(date, df) {
+    df_curve <- df |>
+        filter(refdate == date, biz_days > 0) |>
+        filter(!duplicated(biz_days))
+    curve <- spotratecurve(
+        df_curve$r_252,
+        df_curve$biz_days,
+        "discrete", "business/252", "Brazil/ANBIMA",
+        refdate = date
+    )
+    interpolation(curve) <- interp_flatforward()
+    curve
+}, df = dc) -> curves
+```
+
+## Histórico de juros prefixados de longo prazo {.smaller}
+
+```{.r code-line-numbers="4"}
+curves |>
+    map_dfr(\(x) tibble(
+        refdate = x@refdate,
+        r_BRL_10y = as.numeric(x[[2520]])
+    )) -> rates_10y
+```
+
+```{r cache=TRUE}
+curves |>
+    map_dfr(\(x) tibble(
+        refdate = x@refdate,
+        r_BRL_10y = as.numeric(x[[2520]])
+    )) -> rates_10y
+```
+
+::: {.fragment}
+```{r fig.width=10, fig.height=4}
+rates_10y |>
+    ggplot(aes(x = refdate, y = r_BRL_10y)) +
+    geom_line() +
+    labs(
+        x = NULL, y = NULL,
+        title = "Histórico de Taxas de Juros de 10 Anos",
+        caption = "wilsonfreitas"
+    ) +
+    scale_y_continuous(labels = scales::percent) +
+    theme(legend.position = "none")
+```
+:::
+
+## Índices da B3
+
+- Diversas funções que retoram dados relacionados aos índides divulgados pela B3.
+
+::: incremental
+- `indexes_get()`: Lista os índices disponíveis
+- `index_get()`: Séries históricas dos índices
+- `index_comp_get()`: Composição dos índices
+- `index_weights_get()`: Pesos dos ativos que compõem os índices
+:::
+
+
+## Composição de índices da B3
+
+```{r}
+#| echo: true
+index_weights_get("IBOV")
+```
+
+## Composição de índices da B3 {.smaller}
+
+```{r}
+top_weight <- function(.data, n = 10) {
+    top_10 <- .data |>
+        arrange(desc(weight)) |>
+        slice_head(n = n) |>
+        select(symbol, weight)
+    total_weight <- sum(top_10$weight)
+    others <- tibble(
+        symbol = "Others",
+        weight = 1 - total_weight
+    )
+
+    bind_rows(top_10, others) |>
+        mutate(cum_weight = cumsum(weight)) |>
+        mutate(
+            ymax = cum_weight,
+            ymin = c(0, head(cum_weight, n = -1)),
+            label_pos = (ymax + ymin) / 2,
+            label = paste0(symbol, "\n", scales::percent(weight)),
+            symbol = factor(symbol, ordered = TRUE)
+        )
+}
+
+ggdonut <- function(.data, index_name) {
+    ggplot(.data, aes(
+        ymax = ymax, ymin = ymin,
+        xmax = 4, xmin = 3,
+        fill = symbol
+    )) +
+        geom_rect(colour = "white") +
+        geom_label(
+            x = 4.5, aes(y = label_pos, label = label), size = 3
+        ) +
+        annotate(
+            "text",
+            x = 0, y = 0, label = index_name, size = 16, colour = "grey",
+            fontface = 2
+        ) +
+        coord_polar(theta = "y") +
+        scale_fill_brewer(palette = "Set3") +
+        scale_color_brewer(palette = "Set3") +
+        xlim(c(0, 4)) +
+        theme_void() +
+        theme(legend.position = "none") +
+        labs(
+            caption = "Source: B3 (data imported using \U1F4E6 rb3) - wilsonfreitas"
+        )
+}
+```
+
+```{r cache=TRUE}
+#| echo: true
+index_weights_get("IBOV") |>
+    top_weight(10) |>
+    ggdonut("IBOV")
+```
+
+## Composição de índices da B3 {.smaller}
+
+```{r cache=TRUE}
+#| echo: true
+index_weights_get("IBXX") |>
+    top_weight(10) |>
+    ggdonut("IBXX")
+```
+
+## Composição de índices da B3 {.smaller}
+
+```{r cache=TRUE}
+#| echo: true
+index_weights_get("IBXL") |>
+    top_weight(10) |>
+    ggdonut("IBXL")
+```
+
+## Composição de índices da B3 {.smaller}
+
+```{r cache=TRUE}
+#| echo: true
+index_weights_get("SMLL") |>
+    top_weight(10) |>
+    ggdonut("SMLL")
+```
+
+## Dados de ações - Arquivo `COTAHIST` {.smaller}
+
+::: incremental
+- Função `cotahist_get()` para obter dados do arquivo `COTAHIST`
+- Arquivos: diário, mensal e anual
+- Histórico desde 1990 para arquivos anuais
+:::
+
+<!-- <br/> -->
+
+::: {.fragment}
+::: columns
+::: {.columns width="50%"}
+- `cotahist_get_symbols()`
+- `cotahist_equity_get()`
+- `cotahist_etfs_get()`
+- `cotahist_indexes_get()`
+- `cotahist_equity_options_get()`
+- `cotahist_index_options_get()`
+:::
+::: {.columns width="50%"}
+- `cotahist_funds_options_get()`
+- `cotahist_bdrs_get()`
+- `cotahist_units_get()`
+- `cotahist_fiis_get()`
+- `cotahist_fidcs_get()`
+- `cotahist_fiagros_get()`
+:::
+:::
+:::
+
+## Série histórica de ETFs {.smaller}
+
+```{r cache=TRUE}
+#| echo: true
+#| fig.width: 10
+#| fig.height: 4
+ch <- cotahist_get(as.Date("2023-01-01"), "yearly")
+
+cotahist_etfs_get(ch) |>
+  filter(symbol == "BOVA11") |>
+  ggplot(aes(x = refdate, y = close)) +
+  geom_line()
+```
+
+
+## Opções de ações {.smaller}
+
+::: {.fragment}
+```{r cache=TRUE}
+#| echo: true
+ch <- cotahist_get(as.Date("2023-09-01"), "daily")
+yc <- yc_get(as.Date("2023-09-01"))
+```
+:::
+
+<br/>
+
+::: {.fragment}
+```{r cache=TRUE}
+#| echo: true
+op1 <- cotahist_options_by_symbol_superset("PETR4", ch, yc)
+```
+:::
+
+<!-- <br/> -->
+
+::: {.fragment}
+```{r}
+print(op1)
+```
+:::
+
+## Opções de ações {.smaller}
+
+```{.r code-line-numbers="1-2|4-5|8|10-12|13-14|15-17|18-20"}
+library(bizdays)
+library(oplib)
+
+maturities <- unique(op1$maturity_date) |> sort()
+close_underlying <- op1$close.underlying[1]
+
+op_vol <- op1 |>
+  filter(maturity_date %in% maturities[1:2]) |>
+  mutate(
+    biz_days = bizdays(
+      refdate, following(maturity_date, "Brazil/ANBIMA"), "Brazil/ANBIMA"
+    ),
+    time_to_maturity = biz_days / 252,
+    rate = log(1 + r_252),
+    impvol = bsmimpvol(
+      close, type, close.underlying, strike, time_to_maturity, rate, 0
+    ),
+    delta = bsmdelta(
+      type, close.underlying, strike, time_to_maturity, rate, 0, impvol
+    )
+  ) |>
+  select(
+    symbol, volume,
+    type, close.underlying, strike, time_to_maturity, rate, impvol,
+    delta, biz_days, volume
+  )
+```
+
+```{r cache=TRUE}
+library(bizdays)
+library(oplib)
+
+maturities <- unique(op1$maturity_date) |> sort()
+close_underlying <- op1$close.underlying[1]
+
+op_vol <- op1 |>
+  filter(maturity_date %in% maturities[1:2]) |>
+  mutate(
+    biz_days = bizdays(
+      refdate, following(maturity_date, "Brazil/ANBIMA"), "Brazil/ANBIMA"
+    ),
+    time_to_maturity = biz_days / 252,
+    rate = log(1 + r_252),
+    impvol = bsmimpvol(
+      close, type, close.underlying, strike, time_to_maturity, rate, 0
+    ),
+    delta = bsmdelta(
+      type, close.underlying, strike, time_to_maturity, rate, 0, impvol
+    )
+  ) |>
+  select(
+    symbol, volume,
+    type, close.underlying, strike, time_to_maturity, rate, impvol,
+    delta, biz_days, volume
+  )
+```
+
+## Opções de ações {.smaller}
+
+```{r}
+options(width = 999)
+```
+
+```{r}
+#| echo: TRUE
+op_vol
+```
+
+```{r}
+options(width = 80)
+```
+
+
+## Volatilidade implícita {.smaller}
+
+```{r}
+op_vol |>
+  filter(!is.na(impvol)) |>
+  ggplot(aes(x = strike, y = impvol, colour = type, size = volume)) +
+  geom_point() +
+  geom_vline(xintercept = close_underlying, alpha = 0.5, size = 1) +
+  facet_wrap(type ~ biz_days) +
+  theme(legend.position = "bottom") +
+  labs(
+    x = "Strike", y = "Implied Volatility",
+    title = "Equity Options Volatility - PETR4 2023-09-01"
+  )
+```
+
+## Dinâmica da Volatilidade implícita
+
+<br/>
+<br/>
+
+::: {.fragment}
+```{r cache=TRUE}
+#| echo: true
+ch <- cotahist_get(as.Date("2023-01-01"), "yearly")
+yc <- yc_mget(first_date = as.Date("2023-01-01"),
+              last_date = as.Date("2023-09-01"))
+op <- cotahist_options_by_symbol_superset("PETR4", ch, yc)
+```
+:::
+
+## Dinâmica da Volatilidade implícita {.smaller}
+
+```{r cache=TRUE}
+#| echo: true
+op_vol <- op |>
+  mutate(
+    biz_days = bizdays(
+      refdate, following(maturity_date, "Brazil/B3"), "Brazil/B3"
+    ),
+    time_to_maturity = biz_days / 252,
+    rate = log(1 + r_252),
+    bsm_impvol = bsmimpvol(
+      close, type, close.underlying, strike, time_to_maturity, rate, 0
+    ),
+    delta = bsmdelta(
+      type, close.underlying, strike, time_to_maturity, rate, 0, bsm_impvol
+    )
+  ) |>
+  select(
+    refdate, symbol, volume, maturity_date,
+    type, close.underlying, strike, time_to_maturity, rate,
+    biz_days, close, high, low, bsm_impvol, delta
+  )
+```
+
+## Dinâmica da Volatilidade implícita {.smaller}
+
+```{.r code-line-numbers="2|3-6|7"}
+op1 <- op_vol |>
+  split(op_vol$refdate) |>
+  map_dfr(function(df) {
+    first_mat <- df$maturity_date[which.min(df$maturity_date)]
+    filter(df, maturity_date == first_mat)
+  })
+```
+
+```{r cache=TRUE}
+op1 <- op_vol |>
+  split(op_vol$refdate) |>
+  map_dfr(function(df) {
+    first_mat <- df$maturity_date[which.min(df$maturity_date)]
+    filter(df, maturity_date == first_mat)
+  })
+```
+<br/>
+
+::: {.fragment}
+```{.r code-line-numbers="1|3-4|6-7|9|12"}
+op1_atm <- split(op1, op1$refdate) |>
+  map_dfr(function(df) {
+    df_type <- filter(df, type == "Put")
+    df1 <- df_type[which.min(abs(abs(df_type$delta) - 0.5)), ]
+
+    df_type <- filter(df, type == "Call")
+    df2 <- df_type[which.min(abs(abs(df_type$delta) - 0.5)), ]
+
+    bind_rows(df1, df2)
+  })
+```
+
+```{r cache=TRUE}
+op1_atm <- split(op1, op1$refdate) |>
+  map_dfr(function(df) {
+    df_type <- filter(df, type == "Put")
+    df1 <- df_type[which.min(abs(abs(df_type$delta) - 0.5)), ]
+
+    df_type <- filter(df, type == "Call")
+    df2 <- df_type[which.min(abs(abs(df_type$delta) - 0.5)), ]
+
+    bind_rows(df1, df2)
+  })
+```
+:::
+
+## Dinâmica da Volatilidade implícita {.smaller}
+
+```{r cache=TRUE}
+op1_atm |>
+  ggplot(aes(x = refdate, y = bsm_impvol, colour = type)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(type ~ .) +
+  labs(
+    x = "Data", y = "Volatilidade Implícita",
+    title = "Série Histórica Volatilidade Implícita (ATM) - PETR4",
+    subtitle = "Volatilidade implícita de opções com delta mais próximo de 50%",
+    caption = "Desenvolvido por wilsonfreitas / Fonte: B3"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+## 
+
+<br/>
+
+* http://wilsonfreitas.github.io/rb3
+* http://wilsonfreitas.github.io/R-fixedincome
+* http://wilsonfreitas.github.io/R-bizdays
+* https://github.com/wilsonfreitas/oplib
+
