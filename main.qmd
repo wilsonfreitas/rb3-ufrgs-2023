@@ -762,9 +762,9 @@ op1_atm |>
 
 <br/>
 
-* https://github.com/wilsonfreitas/rb3-ufrgs-2023
-* http://wilsonfreitas.github.io/rb3
-* http://wilsonfreitas.github.io/R-fixedincome
-* http://wilsonfreitas.github.io/R-bizdays
-* https://github.com/wilsonfreitas/oplib
+* <https://github.com/wilsonfreitas/rb3-ufrgs-2023>
+* <http://wilsonfreitas.github.io/rb3>
+* <http://wilsonfreitas.github.io/R-fixedincome>
+* <http://wilsonfreitas.github.io/R-bizdays>
+* <https://github.com/wilsonfreitas/oplib>
 
